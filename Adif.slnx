@@ -6,6 +6,7 @@
     <Project Path="src/Adif.Infrastructure/Adif.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Adif.IntegrationTests/Adif.IntegrationTests.csproj" />
     <Project Path="tests/Adif.UnitTests/Adif.UnitTests.csproj" />
   </Folder>
 </Solution>
