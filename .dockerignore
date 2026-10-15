@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+.git/
+.github/
+.config/
+tests/
+coverage/
+coverage-report/
+TestResults/
+*.md
+.env
+.env.*
+docker-compose*.yml
