@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restaurar dependencias
+        run: dotnet restore Adif.slnx
+
+      - name: Compilar (warnings como errores)
+        run: dotnet build Adif.slnx -c Release --no-restore
+
+      - name: Pruebas con cobertura
+        run: >-
+          dotnet test Adif.slnx -c Release --no-build
+          --settings coverlet.runsettings
+          --collect "XPlat Code Coverage"
+          --results-directory ./coverage
+          --logger "trx;LogFilePrefix=resultados"
+
+      - name: Reporte de cobertura
+        uses: danielpalme/ReportGenerator-GitHub-Action@5
+        with:
+          reports: coverage/**/coverage.cobertura.xml
+          targetdir: coverage-report
+          reporttypes: "HtmlInline;MarkdownSummaryGithub;Badges"
+
+      - name: Publicar resumen en el job
+        run: cat coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Subir artefactos de cobertura y resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-y-resultados
+          path: |
+            coverage-report
+            coverage/**/*.trx

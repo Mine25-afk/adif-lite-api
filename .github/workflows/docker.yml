@@ -1,0 +1,49 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "Directory.*.props"
+      - ".github/workflows/docker.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "Directory.*.props"
+      - ".github/workflows/docker.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Construir imagen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Preparar Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagen (sin publicar)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: "adif-lite-api:${{ github.sha }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verificar que la imagen no corre como root
+        run: |
+          usuario=$(docker image inspect --format '{{.Config.User}}' "adif-lite-api:${{ github.sha }}")
+          echo "Usuario de la imagen: $usuario"
+          test -n "$usuario" && test "$usuario" != "root" && test "$usuario" != "0"
