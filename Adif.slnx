@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Adif.Api/Adif.Api.csproj" />
+    <Project Path="src/Adif.Application/Adif.Application.csproj" />
+    <Project Path="src/Adif.Domain/Adif.Domain.csproj" />
+    <Project Path="src/Adif.Infrastructure/Adif.Infrastructure.csproj" />
+  </Folder>
+</Solution>
